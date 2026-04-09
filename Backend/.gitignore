@@ -1,0 +1,32 @@
+# Build
+bin/
+obj/
+
+# Visual Studio
+.vs/
+
+# Logs
+*.log
+logs/
+
+# Configurações sensíveis
+appsettings.Development.json
+appsettings.Local.json
+
+# Secrets
+secrets.json
+**/secrets.json
+
+# Node (se usar Vue/React)
+node_modules/
+
+# LibMan
+wwwroot/lib/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Banco local
+*.db
+*.sqlite
