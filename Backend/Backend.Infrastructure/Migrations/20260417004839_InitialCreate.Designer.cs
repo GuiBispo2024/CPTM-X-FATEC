@@ -7,44 +7,54 @@ using Oracle.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace Backend.Migrations
+namespace Backend.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260405223932_CreateUsersTable")]
-    partial class CreateUsersTable
+    [Migration("20260417004839_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             OracleModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Backend.Models.Users", b =>
+            modelBuilder.HasSequence<int>("SEQ_USERS");
+
+            modelBuilder.Entity("User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("NUMBER(10)")
-                        .HasColumnName("ID")
-                        .HasDefaultValueSql("SEQ_USERS.NEXTVAL");
+                        .HasColumnName("ID");
+
+                    OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasMaxLength(150)
+                        .HasColumnType("NVARCHAR2(150)")
                         .HasColumnName("EMAIL");
+
+                    b.Property<int>("IsAdmin")
+                        .HasColumnType("NUMBER(10)")
+                        .HasColumnName("IS_ADMIN");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(2000)")
+                        .HasMaxLength(100)
+                        .HasColumnType("NVARCHAR2(100)")
                         .HasColumnName("NAME");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("NVARCHAR2(2000)")
-                        .HasColumnName("PASSWORD");
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("PASSWORD_HASH");
 
                     b.HasKey("Id");
 

@@ -1,14 +1,12 @@
-using Microsoft.OpenApi;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Controllers
 builder.Services.AddControllers();
-builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseOracle(builder.Configuration.GetConnectionString("OracleDb")));
 
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -19,6 +17,19 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
+// DbContext
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseOracle(
+        builder.Configuration.GetConnectionString("OracleDb"),
+        b => b.MigrationsAssembly("Backend.Infrastructure")
+));
+
+// DI
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasherService>();
+
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -29,17 +40,20 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// Middlewares
 app.UseCors("AllowAll");
-
 app.UseHttpsRedirection();
+
 app.UseAuthorization();
 
+// Controllers
 app.MapControllers();
 
 app.Run();
