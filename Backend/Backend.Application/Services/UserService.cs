@@ -17,7 +17,8 @@
         {
             Id = u.Id,
             Name = u.Name,
-            Email = u.Email
+            Email = u.Email,
+            IsAdmin = u.IsAdmin
         }).ToList();
     }
 
@@ -32,7 +33,8 @@
         {
             Id = user.Id,
             Name = user.Name,
-            Email = user.Email
+            Email = user.Email,
+            IsAdmin = user.IsAdmin
         };
     }
 
@@ -54,22 +56,64 @@
         };
     }
 
-    public async Task Update(int id, UserRequest request)
+    public async Task Update(int id, UserUpdateRequest request)
     {
         var user = await _repo.GetById(id);
 
         if (user == null)
             throw new Exception("Usuário não encontrado");
 
+        // valida senha atual
+        var valid = _passwordHasher.Verify(user.PasswordHash, request.CurrentPassword);
+
+        if (!valid)
+            throw new Exception("Senha inválida");
+
         user.Update(request.Name, request.Email);
 
-        if (!string.IsNullOrWhiteSpace(request.Password))
-        {
-            var hash = _passwordHasher.Hash(request.Password);
-            user.SetPasswordHash(hash);
-        }
+        await _repo.Update(user);
+    }
+
+    public async Task UpdatePassword(int id, UpdatePasswordRequest request)
+    {
+        var user = await _repo.GetById(id);
+
+        if (user == null)
+            throw new Exception("Usuário não encontrado");
+
+        var valid = _passwordHasher.Verify(user.PasswordHash, request.CurrentPassword);
+
+        if (!valid)
+            throw new Exception("Senha atual inválida");
+
+        var newHash = _passwordHasher.Hash(request.NewPassword);
+
+        user.UpdatePassword(newHash);
 
         await _repo.Update(user);
+    }
+
+    public async Task SetAdmin(int targetUserId, bool isAdmin, int requesterId)
+    {
+        var requester = await _repo.GetById(requesterId);
+
+        if (requester == null)
+            throw new Exception("Usuário solicitante não encontrado");
+
+        if (!requester.IsAdmin)
+            throw new UnauthorizedAccessException("Apenas admins podem alterar permissões");
+
+        var target = await _repo.GetById(targetUserId);
+
+        if (target == null)
+            throw new Exception("Usuário alvo não encontrado");
+
+        if (target.Id == requesterId)
+            throw new Exception("Você não pode alterar seu próprio nível de acesso");
+
+        target.SetAdmin(isAdmin); //sem requesterId
+
+        await _repo.Update(target);
     }
 
     public async Task Delete(int id)

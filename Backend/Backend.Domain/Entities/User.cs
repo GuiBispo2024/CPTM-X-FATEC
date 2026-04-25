@@ -17,29 +17,28 @@
         PasswordHash = passwordHash;
         IsAdmin = false;
     }
-
     public void SetAdmin(bool isAdmin)
     {
         IsAdmin = isAdmin;
     }
-
+    public void MakeAdmin()
+    {
+        IsAdmin = true;
+    }
     public void Update(string name, string email)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new Exception("Nome inválido");
-
-        if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))
-            throw new Exception("Email inválido");
+        Validate(name, email, PasswordHash);
 
         Name = name;
         Email = email;
     }
-
-    public void SetPasswordHash(string passwordHash)
+    public void UpdatePassword(string newPasswordHash)
     {
-        PasswordHash = passwordHash;
-    }
+        if (string.IsNullOrWhiteSpace(newPasswordHash))
+            throw new Exception("Senha inválida");
 
+        PasswordHash = newPasswordHash;
+    }
     private void Validate(string name, string email, string passwordHash)
     {
         if (string.IsNullOrWhiteSpace(name))

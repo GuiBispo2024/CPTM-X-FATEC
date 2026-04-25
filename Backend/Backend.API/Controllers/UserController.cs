@@ -22,15 +22,57 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create(UserRequest request)
     {
-        var user = await _service.Create(request);
-        return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+        try
+        {
+            var user = await _service.Create(request);
+            return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UserRequest request)
+    public async Task<IActionResult> Update(int id, UserUpdateRequest request)
     {
-        await _service.Update(id, request);
-        return NoContent();
+        try
+        {
+            await _service.Update(id, request);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPut("{id}/password")]
+    public async Task<IActionResult> UpdatePassword(int id, UpdatePasswordRequest request)
+    {
+        try
+        {
+            await _service.UpdatePassword(id, request);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpPatch("{id}/admin")]
+    public async Task<IActionResult> SetAdmin(int id, bool isAdmin, int requesterId)
+    {
+        try
+        {
+            await _service.SetAdmin(id, isAdmin, requesterId);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpDelete("{id}")]

@@ -36,7 +36,10 @@ public class AppDbContext : DbContext
 
             entity.Property(u => u.IsAdmin)
                 .HasColumnName("IS_ADMIN")
-                .HasConversion<int>() //Oracle (1/0)
+                .HasConversion(
+                    v => v ? 1 : 0,
+                    v => v == 1
+                )
                 .IsRequired();
         });
 
