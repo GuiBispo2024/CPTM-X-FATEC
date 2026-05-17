@@ -56,37 +56,57 @@
         };
     }
 
-    public async Task Update(int id, UserUpdateRequest request)
+    public async Task Update(int id, int loggedUserId, UserUpdateRequest request)
     {
+        if (loggedUserId != id)
+            throw new UnauthorizedAccessException(
+                "Você só pode alterar sua própria conta"
+            );
+
         var user = await _repo.GetById(id);
 
         if (user == null)
             throw new Exception("Usuário não encontrado");
 
-        // valida senha atual
-        var valid = _passwordHasher.Verify(user.PasswordHash, request.CurrentPassword);
+        var valid = _passwordHasher.Verify(
+            user.PasswordHash,
+            request.CurrentPassword
+        );
 
         if (!valid)
             throw new Exception("Senha inválida");
 
-        user.Update(request.Name, request.Email);
+        user.Update(
+            request.Name,
+            request.Email
+        );
 
         await _repo.Update(user);
     }
 
-    public async Task UpdatePassword(int id, UpdatePasswordRequest request)
+    public async Task UpdatePassword(int id, int loggedUserId, UpdatePasswordRequest request)
     {
+        if (loggedUserId != id)
+            throw new UnauthorizedAccessException(
+                "Você só pode alterar sua própria senha"
+            );
+
         var user = await _repo.GetById(id);
 
         if (user == null)
             throw new Exception("Usuário não encontrado");
 
-        var valid = _passwordHasher.Verify(user.PasswordHash, request.CurrentPassword);
+        var valid = _passwordHasher.Verify(
+            user.PasswordHash,
+            request.CurrentPassword
+        );
 
         if (!valid)
             throw new Exception("Senha atual inválida");
 
-        var newHash = _passwordHasher.Hash(request.NewPassword);
+        var newHash = _passwordHasher.Hash(
+            request.NewPassword
+        );
 
         user.UpdatePassword(newHash);
 
@@ -116,8 +136,20 @@
         await _repo.Update(target);
     }
 
-    public async Task Delete(int id)
+    public async Task Delete(int id, int loggedUserId)
     {
+        var loggedUser = await _repo.GetById(loggedUserId);
+
+        if (loggedUser == null)
+            throw new Exception("Usuário autenticado inválido");
+
+        // usuário comum só deleta a própria conta
+        // admin pode deletar qualquer conta
+        if (!loggedUser.IsAdmin && loggedUserId != id)
+            throw new UnauthorizedAccessException(
+                "Você só pode deletar sua própria conta"
+            );
+
         var user = await _repo.GetById(id);
 
         if (user == null)

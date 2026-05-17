@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,33 @@ builder.Services.AddSwaggerGen(options =>
         Title = "API CPTM",
         Version = "v1"
     });
+
+    options.AddSecurityDefinition("Bearer",
+        new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Digite: Bearer {seu token}"
+        });
+
+    options.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
 });
 
 // DbContext
@@ -29,6 +59,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasherService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<
+    IPasswordResetTokenRepository,
+    PasswordResetTokenRepository>();
+builder.Services.AddScoped<
+    IEmailService,
+    EmailService>();
 
 // CORS
 builder.Services.AddCors(options =>
@@ -39,31 +77,33 @@ builder.Services.AddCors(options =>
                         .AllowAnyMethod());
 });
 
-var app = builder.Build();
-
-// Seed ADM
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-
-    var adminExists = context.Users
-        .FirstOrDefault(u => u.Email == "admin@cptm.com");
-
-    if (adminExists == null)
+// Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        var admin = new User(
-            "Admin",
-            "admin@cptm.com",
-            hasher.Hash("admin123")
-        );
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
 
-        admin.MakeAdmin();
+                ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                ValidAudience = builder.Configuration["Jwt:Audience"],
 
-        context.Users.Add(admin);
-        context.SaveChanges();
-    }
-}
+                IssuerSigningKey =
+                    new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(
+                            builder.Configuration["Jwt:Key"]!
+                        )
+                    )
+            };
+});
+
+builder.Services.AddAuthorization();
+
+var app = builder.Build();
 
 // Swagger
 if (app.Environment.IsDevelopment())
@@ -75,7 +115,8 @@ if (app.Environment.IsDevelopment())
 // Middlewares
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
-
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Controllers
