@@ -61,12 +61,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasherService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<
-    IPasswordResetTokenRepository,
-    PasswordResetTokenRepository>();
-builder.Services.AddScoped<
-    IEmailService,
-    EmailService>();
+builder.Services.AddScoped<IPasswordResetTokenRepository,PasswordResetTokenRepository>();
+builder.Services.AddScoped<IEmailService,EmailService>();
+builder.Services.AddScoped<IEfluenteRepository,EfluenteRepository>();
+builder.Services.AddScoped<IEfluenteService,EfluenteService>();
 
 // CORS
 builder.Services.AddCors(options =>

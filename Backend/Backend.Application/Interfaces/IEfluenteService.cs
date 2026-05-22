@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Backend.Application.Interfaces
+﻿public interface IEfluenteService
 {
-    internal class IEfluenteService
-    {
-    }
+    Task<EfluenteResponse> Create(CreateEfluenteRequest request);
+
+    Task Update(int id,UpdateEfluenteRequest request);
+
+    Task Delete(int id);
+
+    Task<EfluenteResponse> GetById(int id);
+
+    Task<List<EfluenteResponse>> GetAll();
 }
