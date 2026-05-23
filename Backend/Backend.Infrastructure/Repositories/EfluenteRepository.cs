@@ -44,4 +44,12 @@ public class EfluenteRepository
             .OrderByDescending(x => x.DataCadastro)
             .ToListAsync();
     }
+
+    public async Task<List<Efluente>> GetPendingSync()
+    {
+        return await _context.Efluentes
+            .Where(e =>
+                e.SyncStatus == "PENDING")
+            .ToListAsync();
+    }
 }

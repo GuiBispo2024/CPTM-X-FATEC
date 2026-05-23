@@ -62,4 +62,13 @@ public class EfluenteController
 
         return NoContent();
     }
+
+    [HttpGet("pending-sync")]
+    public async Task<IActionResult> GetPendingSync()
+    {
+        var result =
+            await _service.GetPendingSync();
+
+        return Ok(result);
+    }
 }

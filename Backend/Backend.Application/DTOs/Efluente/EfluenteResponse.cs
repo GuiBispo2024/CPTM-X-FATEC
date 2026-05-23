@@ -27,4 +27,14 @@
     public string Observacao { get; set; } = null!;
 
     public DateTime DataCadastro { get; set; }
+
+    public Guid SyncId { get; set; }
+
+    public string SyncStatus { get; set; } = null!;
+
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
+
+    public bool IsDeleted { get; set; }
 }

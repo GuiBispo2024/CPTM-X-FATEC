@@ -76,5 +76,25 @@ public class EfluenteConfiguration
         builder.Property(x => x.DataCadastro)
             .HasColumnName("DT_DATA_CADASTRO")
             .IsRequired();
+
+        builder.Property(e => e.SyncId)
+            .HasColumnName("SYNC_ID");
+
+        builder.Property(e => e.SyncStatus)
+            .HasColumnName("SYNC_STATUS")
+            .HasMaxLength(20);
+
+        builder.Property(e => e.CreatedAt)
+            .HasColumnName("CREATED_AT");
+
+        builder.Property(e => e.UpdatedAt)
+            .HasColumnName("UPDATED_AT");
+
+        builder.Property(e => e.IsDeleted)
+            .HasColumnName("IS_DELETED")
+            .HasConversion(
+                v => v ? 1 : 0,
+                v => v == 1
+            );
     }
 }

@@ -66,7 +66,9 @@
                 "Efluente não encontrado"
             );
 
-        await _repo.Delete(efluente);
+        efluente.Delete();
+
+        await _repo.Update(efluente);
     }
 
     public async Task<EfluenteResponse>
@@ -116,7 +118,22 @@
                 e.StatusDesvioAmbiental,
             Observacao = e.Observacao,
             DataCadastro =
-                e.DataCadastro
+                e.DataCadastro,
+            SyncId = e.SyncId,
+            SyncStatus = e.SyncStatus,
+            CreatedAt = e.CreatedAt,
+            UpdatedAt = e.UpdatedAt,
+            IsDeleted = e.IsDeleted,
         };
+    }
+
+    public async Task<List<EfluenteResponse>> GetPendingSync()
+    {
+        var list =
+            await _repo.GetPendingSync();
+
+        return list
+            .Select(MapToResponse)
+            .ToList();
     }
 }

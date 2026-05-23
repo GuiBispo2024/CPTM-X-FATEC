@@ -9,4 +9,6 @@
     Task<EfluenteResponse> GetById(int id);
 
     Task<List<EfluenteResponse>> GetAll();
+
+    Task<List<EfluenteResponse>> GetPendingSync();
 }

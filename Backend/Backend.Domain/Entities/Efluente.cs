@@ -31,6 +31,16 @@
     // Controle
     public DateTime DataCadastro { get; private set; }
 
+    public Guid SyncId { get; private set; }
+
+    public string SyncStatus { get; private set; } = null!;
+
+    public DateTime CreatedAt { get; private set; }
+
+    public DateTime UpdatedAt { get; private set; }
+
+    public bool IsDeleted { get; private set; }
+
     protected Efluente() { }
 
     public Efluente(
@@ -71,6 +81,12 @@
         Observacao = observacao;
 
         DataCadastro = DateTime.UtcNow;
+
+        SyncId = Guid.NewGuid();
+        SyncStatus = "PENDING";
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
+        IsDeleted = false;
     }
 
     public void Update(
@@ -97,6 +113,8 @@
         TipoEfluente = tipoEfluente;
         StatusDesvioAmbiental = statusDesvioAmbiental;
         Observacao = observacao;
+        UpdatedAt = DateTime.UtcNow;
+        SyncStatus = "PENDING";
     }
 
     private void Validate(
@@ -132,5 +150,14 @@
 
         if (string.IsNullOrWhiteSpace(municipio))
             throw new Exception("Município obrigatório");
+    }
+
+    public void Delete()
+    {
+        IsDeleted = true;
+
+        UpdatedAt = DateTime.UtcNow;
+
+        SyncStatus = "PENDING";
     }
 }
