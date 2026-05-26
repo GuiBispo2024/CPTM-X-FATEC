@@ -1,8 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         b => b.MigrationsAssembly("Backend.Infrastructure")
 ));
 
-
 // DI
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -65,6 +65,16 @@ builder.Services.AddScoped<IPasswordResetTokenRepository,PasswordResetTokenRepos
 builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddScoped<IEfluenteRepository,EfluenteRepository>();
 builder.Services.AddScoped<IEfluenteService,EfluenteService>();
+
+// Status converter
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions
+            .Converters
+            .Add(new JsonStringEnumConverter());
+    });
 
 // CORS
 builder.Services.AddCors(options =>

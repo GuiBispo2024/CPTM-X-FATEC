@@ -11,45 +11,56 @@ public class EfluenteRepository
         _context = context;
     }
 
-    public async Task Add(Efluente efluente)
+    public async Task Add(
+        Efluente efluente)
     {
-        await _context.Efluentes.AddAsync(efluente);
+        await _context.Efluentes
+            .AddAsync(efluente);
 
         await _context.SaveChangesAsync();
     }
 
-    public async Task Update(Efluente efluente)
+    public async Task Update(
+        Efluente efluente)
     {
         _context.Efluentes.Update(efluente);
 
         await _context.SaveChangesAsync();
     }
 
-    public async Task Delete(Efluente efluente)
+    public async Task Delete(
+    Efluente efluente)
     {
-        _context.Efluentes.Remove(efluente);
+        _context.Efluentes.Update(efluente);
 
         await _context.SaveChangesAsync();
     }
 
-    public async Task<Efluente?> GetById(int id)
+    public async Task<Efluente?> GetById(
+        int id)
     {
         return await _context.Efluentes
-            .FirstOrDefaultAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(
+                e => e.Id == id &&
+                     !e.IsDeleted
+            );
     }
 
     public async Task<List<Efluente>> GetAll()
     {
         return await _context.Efluentes
-            .OrderByDescending(x => x.DataCadastro)
+            .Where(e => !e.IsDeleted)
             .ToListAsync();
     }
 
-    public async Task<List<Efluente>> GetPendingSync()
+    public async Task<List<Efluente>>
+        GetPendingSync()
     {
         return await _context.Efluentes
-            .Where(e =>
-                e.SyncStatus == "PENDING")
+            .Where(
+                e => e.SyncStatus ==
+                     SyncStatus.Pending
+            )
             .ToListAsync();
     }
 }

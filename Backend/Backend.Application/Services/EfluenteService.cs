@@ -1,5 +1,4 @@
-﻿public class EfluenteService
-    : IEfluenteService
+﻿public class EfluenteService : IEfluenteService
 {
     private readonly IEfluenteRepository _repo;
 
@@ -15,13 +14,28 @@
         var efluente = new Efluente(
             request.NomeContratada,
             request.NumeroContrato,
+            request.SiglaDepartamentoMeioAmbiente,
+            request.AreaGestoraCptm,
+            request.DiretoriaCptm,
+            request.ProgramaAmbiental,
+            request.NaturezaPga,
+            request.Municipio,
             request.LinhaCptm,
             request.ViaCptm,
-            request.Municipio,
+            request.TrechoSentido,
+            request.EstacaoCptm,
             request.Endereco,
             request.CoordenadaGeografica,
-            request.TipoEfluente,
+            request.TipoAtividade,
+            request.TipoDra,
+            request.TipoAtividadeCptm,
+            request.NomeLocalAtividade,
+            request.OrigemEfluente,
+            request.FonteGeradora,
+            request.TipoDestinacao,
+            request.TipoVeiculo,
             request.StatusDesvioAmbiental,
+            request.StatusRegistroBd,
             request.Observacao
         );
 
@@ -43,13 +57,30 @@
             );
 
         efluente.Update(
+            request.NomeContratada,
+            request.NumeroContrato,
+            request.SiglaDepartamentoMeioAmbiente,
+            request.AreaGestoraCptm,
+            request.DiretoriaCptm,
+            request.ProgramaAmbiental,
+            request.NaturezaPga,
+            request.Municipio,
             request.LinhaCptm,
             request.ViaCptm,
-            request.Municipio,
+            request.TrechoSentido,
+            request.EstacaoCptm,
             request.Endereco,
             request.CoordenadaGeografica,
-            request.TipoEfluente,
+            request.TipoAtividade,
+            request.TipoDra,
+            request.TipoAtividadeCptm,
+            request.NomeLocalAtividade,
+            request.OrigemEfluente,
+            request.FonteGeradora,
+            request.TipoDestinacao,
+            request.TipoVeiculo,
             request.StatusDesvioAmbiental,
+            request.StatusRegistroBd,
             request.Observacao
         );
 
@@ -71,8 +102,8 @@
         await _repo.Update(efluente);
     }
 
-    public async Task<EfluenteResponse>
-        GetById(int id)
+    public async Task<EfluenteResponse> GetById(
+        int id)
     {
         var efluente =
             await _repo.GetById(id);
@@ -88,9 +119,21 @@
     public async Task<List<EfluenteResponse>>
         GetAll()
     {
-        var list = await _repo.GetAll();
+        var efluentes =
+            await _repo.GetAll();
 
-        return list
+        return efluentes
+            .Select(MapToResponse)
+            .ToList();
+    }
+
+    public async Task<List<EfluenteResponse>>
+        GetPendingSync()
+    {
+        var efluentes =
+            await _repo.GetPendingSync();
+
+        return efluentes
             .Select(MapToResponse)
             .ToList();
     }
@@ -101,39 +144,61 @@
         return new EfluenteResponse
         {
             Id = e.Id,
+            SyncId = e.SyncId,
+            SyncStatus = e.SyncStatus,
+
             NomeContratada = e.NomeContratada,
             NumeroContrato = e.NumeroContrato,
+            SiglaDepartamentoMeioAmbiente =
+                e.SiglaDepartamentoMeioAmbiente,
+            AreaGestoraCptm =
+                e.AreaGestoraCptm,
+            DiretoriaCptm =
+                e.DiretoriaCptm,
             ProgramaAmbiental =
                 e.ProgramaAmbiental,
-            Natureza = e.Natureza,
+            NaturezaPga =
+                e.NaturezaPga,
+
+            Municipio = e.Municipio,
             LinhaCptm = e.LinhaCptm,
             ViaCptm = e.ViaCptm,
-            Municipio = e.Municipio,
+            TrechoSentido =
+                e.TrechoSentido,
+            EstacaoCptm =
+                e.EstacaoCptm,
             Endereco = e.Endereco,
             CoordenadaGeografica =
                 e.CoordenadaGeografica,
-            TipoEfluente =
-                e.TipoEfluente,
+
+            TipoAtividade =
+                e.TipoAtividade,
+            TipoDra =
+                e.TipoDra,
+            TipoAtividadeCptm =
+                e.TipoAtividadeCptm,
+            NomeLocalAtividade =
+                e.NomeLocalAtividade,
+            OrigemEfluente =
+                e.OrigemEfluente,
+            FonteGeradora =
+                e.FonteGeradora,
+            TipoDestinacao =
+                e.TipoDestinacao,
+            TipoVeiculo =
+                e.TipoVeiculo,
+
             StatusDesvioAmbiental =
                 e.StatusDesvioAmbiental,
+
+            StatusRegistroBd =
+                e.StatusRegistroBd,
+
             Observacao = e.Observacao,
-            DataCadastro =
-                e.DataCadastro,
-            SyncId = e.SyncId,
-            SyncStatus = e.SyncStatus,
+
             CreatedAt = e.CreatedAt,
             UpdatedAt = e.UpdatedAt,
-            IsDeleted = e.IsDeleted,
+            IsDeleted = e.IsDeleted
         };
-    }
-
-    public async Task<List<EfluenteResponse>> GetPendingSync()
-    {
-        var list =
-            await _repo.GetPendingSync();
-
-        return list
-            .Select(MapToResponse)
-            .ToList();
     }
 }

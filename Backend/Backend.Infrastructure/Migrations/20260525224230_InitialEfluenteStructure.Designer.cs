@@ -11,8 +11,8 @@ using Oracle.EntityFrameworkCore.Metadata;
 namespace Backend.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260523003406_AddOfflineSupport")]
-    partial class AddOfflineSupport
+    [Migration("20260525224230_InitialEfluenteStructure")]
+    partial class InitialEfluenteStructure
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -35,105 +35,155 @@ namespace Backend.Infrastructure.Migrations
 
                     OraclePropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AreaGestoraCptm")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("AREA_GESTORA_CPTM");
+
                     b.Property<string>("CoordenadaGeografica")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("NVARCHAR2(200)")
-                        .HasColumnName("TX_COORDENADA_GEOGRAFICA");
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("COORDENADA_GEO");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TIMESTAMP(7)")
                         .HasColumnName("CREATED_AT");
 
-                    b.Property<DateTime>("DataCadastro")
-                        .HasColumnType("TIMESTAMP(7)")
-                        .HasColumnName("DT_DATA_CADASTRO");
+                    b.Property<string>("DiretoriaCptm")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("DIRETORIA_CPTM");
 
                     b.Property<string>("Endereco")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("NVARCHAR2(300)")
-                        .HasColumnName("TX_ENDERECO");
+                        .HasMaxLength(500)
+                        .HasColumnType("NVARCHAR2(500)")
+                        .HasColumnName("ENDERECO");
+
+                    b.Property<string>("EstacaoCptm")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("ESTACAO_CPTM");
+
+                    b.Property<string>("FonteGeradora")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("FONTE_GERADORA");
 
                     b.Property<int>("IsDeleted")
                         .HasColumnType("NUMBER(10)")
                         .HasColumnName("IS_DELETED");
 
                     b.Property<string>("LinhaCptm")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("NVARCHAR2(100)")
-                        .HasColumnName("TX_LINHA_CPTM");
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("LINHA_CPTM");
 
                     b.Property<string>("Municipio")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("NVARCHAR2(100)")
-                        .HasColumnName("TX_MUNICIPIO");
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("MUNICIPIO");
 
-                    b.Property<string>("Natureza")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("NVARCHAR2(100)")
-                        .HasColumnName("TX_NATUREZA");
+                    b.Property<string>("NaturezaPga")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("NATUREZA_PGA");
 
                     b.Property<string>("NomeContratada")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("NVARCHAR2(200)")
-                        .HasColumnName("TX_NOME_CONTRATADA");
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("NOME_CONTRATADA");
+
+                    b.Property<string>("NomeLocalAtividade")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("NM_LOCAL_ATIVIDADE");
 
                     b.Property<string>("NumeroContrato")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("NVARCHAR2(100)")
-                        .HasColumnName("TX_NUMERO_CONTRATO");
+                        .HasColumnName("NUMERO_CONTRATO");
 
                     b.Property<string>("Observacao")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("NVARCHAR2(2000)")
-                        .HasColumnName("TX_OBSERVACAO");
+                        .HasMaxLength(300)
+                        .HasColumnType("NVARCHAR2(300)")
+                        .HasColumnName("OBSERVACAO");
+
+                    b.Property<string>("OrigemEfluente")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("ORIGEM_EFLUENTE");
 
                     b.Property<string>("ProgramaAmbiental")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("NVARCHAR2(200)")
-                        .HasColumnName("TX_PROGRAMA_AMBIENTAL");
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("PROGRAMA_AMBIENTAL");
 
-                    b.Property<string>("StatusDesvioAmbiental")
-                        .IsRequired()
+                    b.Property<string>("SiglaDepartamentoMeioAmbiente")
                         .HasMaxLength(100)
                         .HasColumnType("NVARCHAR2(100)")
-                        .HasColumnName("TX_STATUS_DESVIO_AMBIENTAL");
+                        .HasColumnName("SIGLA_DEPTO_MA");
+
+                    b.Property<string>("StatusDesvioAmbiental")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("STATUS_DESVIO");
+
+                    b.Property<string>("StatusRegistroBd")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("STATUS_REGISTRO_BD");
 
                     b.Property<Guid>("SyncId")
                         .HasColumnType("RAW(16)")
                         .HasColumnName("SYNC_ID");
 
-                    b.Property<string>("SyncStatus")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("NVARCHAR2(20)")
+                    b.Property<int>("SyncStatus")
+                        .HasColumnType("NUMBER(10)")
                         .HasColumnName("SYNC_STATUS");
 
-                    b.Property<string>("TipoEfluente")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("NVARCHAR2(100)")
-                        .HasColumnName("TX_TIPO_EFLUENTE");
+                    b.Property<string>("TipoAtividade")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("TIPO_ATIVIDADE");
+
+                    b.Property<string>("TipoAtividadeCptm")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("TIPO_ATIVIDADE_CPTM");
+
+                    b.Property<string>("TipoDestinacao")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("TIPO_DESTINACAO");
+
+                    b.Property<string>("TipoDra")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("TIPO_DRA");
+
+                    b.Property<string>("TipoVeiculo")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("TIPO_VEICULO");
+
+                    b.Property<string>("TrechoSentido")
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("TRECHO_SENTIDO");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("TIMESTAMP(7)")
                         .HasColumnName("UPDATED_AT");
 
                     b.Property<string>("ViaCptm")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("NVARCHAR2(100)")
-                        .HasColumnName("TX_VIA_CPTM");
+                        .HasMaxLength(255)
+                        .HasColumnType("NVARCHAR2(255)")
+                        .HasColumnName("VIA_CPTM");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SyncId")
+                        .IsUnique();
 
                     b.ToTable("PT_EFLUENTE", (string)null);
                 });

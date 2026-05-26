@@ -9,80 +9,121 @@ public class EfluenteConfiguration
     {
         builder.ToTable("PT_EFLUENTE");
 
-        // PK
-        builder.HasKey(x => x.Id);
+        builder.HasKey(e => e.Id);
 
-        builder.Property(x => x.Id)
-            .HasColumnName("ID");
+        builder.Property(e => e.Id)
+            .HasColumnName("ID")
+            .ValueGeneratedOnAdd();
 
-        // Institucional
-        builder.Property(x => x.NomeContratada)
-            .HasColumnName("TX_NOME_CONTRATADA")
-            .HasMaxLength(200)
-            .IsRequired();
-
-        builder.Property(x => x.NumeroContrato)
-            .HasColumnName("TX_NUMERO_CONTRATO")
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.Property(x => x.ProgramaAmbiental)
-            .HasColumnName("TX_PROGRAMA_AMBIENTAL")
-            .HasMaxLength(200)
-            .IsRequired();
-
-        builder.Property(x => x.Natureza)
-            .HasColumnName("TX_NATUREZA")
-            .HasMaxLength(100)
-            .IsRequired();
-
-        // Caracterização
-        builder.Property(x => x.LinhaCptm)
-            .HasColumnName("TX_LINHA_CPTM")
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.Property(x => x.ViaCptm)
-            .HasColumnName("TX_VIA_CPTM")
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.Property(x => x.Municipio)
-            .HasColumnName("TX_MUNICIPIO")
-            .HasMaxLength(100)
-            .IsRequired();
-
-        builder.Property(x => x.Endereco)
-            .HasColumnName("TX_ENDERECO")
-            .HasMaxLength(300);
-
-        builder.Property(x => x.CoordenadaGeografica)
-            .HasColumnName("TX_COORDENADA_GEOGRAFICA")
-            .HasMaxLength(200);
-
-        builder.Property(x => x.TipoEfluente)
-            .HasColumnName("TX_TIPO_EFLUENTE")
-            .HasMaxLength(100);
-
-        builder.Property(x => x.StatusDesvioAmbiental)
-            .HasColumnName("TX_STATUS_DESVIO_AMBIENTAL")
-            .HasMaxLength(100);
-
-        builder.Property(x => x.Observacao)
-            .HasColumnName("TX_OBSERVACAO")
-            .HasMaxLength(2000);
-
-        // Controle
-        builder.Property(x => x.DataCadastro)
-            .HasColumnName("DT_DATA_CADASTRO")
-            .IsRequired();
+        builder.HasIndex(e => e.SyncId)
+            .IsUnique();
 
         builder.Property(e => e.SyncId)
             .HasColumnName("SYNC_ID");
 
         builder.Property(e => e.SyncStatus)
             .HasColumnName("SYNC_STATUS")
-            .HasMaxLength(20);
+            .HasConversion<int>();
+
+        builder.Property(e => e.NomeContratada)
+            .HasColumnName("NOME_CONTRATADA")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.NumeroContrato)
+            .HasColumnName("NUMERO_CONTRATO")
+            .HasMaxLength(100);
+
+        builder.Property(e => e.SiglaDepartamentoMeioAmbiente)
+            .HasColumnName("SIGLA_DEPTO_MA")
+            .HasMaxLength(100);
+
+        builder.Property(e => e.AreaGestoraCptm)
+            .HasColumnName("AREA_GESTORA_CPTM")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.DiretoriaCptm)
+            .HasColumnName("DIRETORIA_CPTM")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.ProgramaAmbiental)
+            .HasColumnName("PROGRAMA_AMBIENTAL")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.NaturezaPga)
+            .HasColumnName("NATUREZA_PGA")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.Municipio)
+            .HasColumnName("MUNICIPIO")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.LinhaCptm)
+            .HasColumnName("LINHA_CPTM")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.ViaCptm)
+            .HasColumnName("VIA_CPTM")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.TrechoSentido)
+            .HasColumnName("TRECHO_SENTIDO")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.EstacaoCptm)
+            .HasColumnName("ESTACAO_CPTM")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.Endereco)
+            .HasColumnName("ENDERECO")
+            .HasMaxLength(500);
+
+        builder.Property(e => e.CoordenadaGeografica)
+            .HasColumnName("COORDENADA_GEO")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.TipoAtividade)
+            .HasColumnName("TIPO_ATIVIDADE")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.TipoDra)
+            .HasColumnName("TIPO_DRA")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.TipoAtividadeCptm)
+            .HasColumnName("TIPO_ATIVIDADE_CPTM")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.NomeLocalAtividade)
+            .HasColumnName("NM_LOCAL_ATIVIDADE")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.OrigemEfluente)
+            .HasColumnName("ORIGEM_EFLUENTE")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.FonteGeradora)
+            .HasColumnName("FONTE_GERADORA")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.TipoDestinacao)
+            .HasColumnName("TIPO_DESTINACAO")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.TipoVeiculo)
+            .HasColumnName("TIPO_VEICULO")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.StatusDesvioAmbiental)
+            .HasColumnName("STATUS_DESVIO")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.StatusRegistroBd)
+            .HasColumnName("STATUS_REGISTRO_BD")
+            .HasMaxLength(255);
+
+        builder.Property(e => e.Observacao)
+            .HasColumnName("OBSERVACAO")
+            .HasMaxLength(300);
 
         builder.Property(e => e.CreatedAt)
             .HasColumnName("CREATED_AT");

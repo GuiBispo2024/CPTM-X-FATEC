@@ -2,38 +2,83 @@
 {
     public int Id { get; private set; }
 
-    // Institucional
-    public string NomeContratada { get; private set; } = null!;
-
-    public string NumeroContrato { get; private set; } = null!;
-
-    public string ProgramaAmbiental { get; private set; } = null!;
-
-    public string Natureza { get; private set; } = null!;
-
-    // Caracterização
-    public string LinhaCptm { get; private set; } = null!;
-
-    public string ViaCptm { get; private set; } = null!;
-
-    public string Municipio { get; private set; } = null!;
-
-    public string Endereco { get; private set; } = null!;
-
-    public string CoordenadaGeografica { get; private set; } = null!;
-
-    public string TipoEfluente { get; private set; } = null!;
-
-    public string StatusDesvioAmbiental { get; private set; } = null!;
-
-    public string Observacao { get; private set; } = null!;
-
-    // Controle
-    public DateTime DataCadastro { get; private set; }
+    // ========================================
+    // OFFLINE / SYNC
+    // ========================================
 
     public Guid SyncId { get; private set; }
 
-    public string SyncStatus { get; private set; } = null!;
+    public SyncStatus SyncStatus { get; private set; }
+
+    // ========================================
+    // INSTITUCIONAL
+    // ========================================
+
+    public string? NomeContratada { get; private set; }
+
+    public string? NumeroContrato { get; private set; }
+
+    public string? SiglaDepartamentoMeioAmbiente { get; private set; }
+
+    public string? AreaGestoraCptm { get; private set; }
+
+    public string? DiretoriaCptm { get; private set; }
+
+    public string? ProgramaAmbiental { get; private set; }
+
+    public string? NaturezaPga { get; private set; }
+
+    // ========================================
+    // LOCALIZAÇÃO
+    // ========================================
+
+    public string? Municipio { get; private set; }
+
+    public string? LinhaCptm { get; private set; }
+
+    public string? ViaCptm { get; private set; }
+
+    public string? TrechoSentido { get; private set; }
+
+    public string? EstacaoCptm { get; private set; }
+
+    public string? Endereco { get; private set; }
+
+    public string? CoordenadaGeografica { get; private set; }
+
+    // ========================================
+    // CARACTERIZAÇÃO
+    // ========================================
+
+    public string? TipoAtividade { get; private set; }
+
+    public string? TipoDra { get; private set; }
+
+    public string? TipoAtividadeCptm { get; private set; }
+
+    public string? NomeLocalAtividade { get; private set; }
+
+    public string? OrigemEfluente { get; private set; }
+
+    public string? FonteGeradora { get; private set; }
+
+    public string? TipoDestinacao { get; private set; }
+
+    public string? TipoVeiculo { get; private set; }
+
+    // ========================================
+    // CONTROLE
+    // ========================================
+
+    public string? StatusDesvioAmbiental { get; private set; }
+
+    public string? StatusRegistroBd { get; private set; }
+
+    public string? Observacao { get; private set; }
+
+    // ========================================
+    // AUDITORIA
+    // ========================================
 
     public DateTime CreatedAt { get; private set; }
 
@@ -46,110 +91,177 @@
     public Efluente(
         string nomeContratada,
         string numeroContrato,
+        string siglaDepartamentoMeioAmbiente,
+        string areaGestoraCptm,
+        string diretoriaCptm,
+        string programaAmbiental,
+        string naturezaPga,
+        string municipio,
         string linhaCptm,
         string viaCptm,
-        string municipio,
+        string trechoSentido,
+        string estacaoCptm,
         string endereco,
         string coordenadaGeografica,
-        string tipoEfluente,
+        string tipoAtividade,
+        string tipoDra,
+        string tipoAtividadeCptm,
+        string nomeLocalAtividade,
+        string origemEfluente,
+        string fonteGeradora,
+        string tipoDestinacao,
+        string tipoVeiculo,
         string statusDesvioAmbiental,
+        string statusRegistroBd,
         string observacao)
     {
-        Validate(
-            nomeContratada,
-            numeroContrato,
-            linhaCptm,
-            viaCptm,
-            municipio
-        );
-
         NomeContratada = nomeContratada;
         NumeroContrato = numeroContrato;
+        SiglaDepartamentoMeioAmbiente =
+            siglaDepartamentoMeioAmbiente;
+        AreaGestoraCptm = areaGestoraCptm;
+        DiretoriaCptm = diretoriaCptm;
+        ProgramaAmbiental = programaAmbiental;
+        NaturezaPga = naturezaPga;
 
-        ProgramaAmbiental =
-            "Efluentes e Emissões Atmosféricas - EEA";
-
-        Natureza = "Efluentes - EF";
-
+        Municipio = municipio;
         LinhaCptm = linhaCptm;
         ViaCptm = viaCptm;
-        Municipio = municipio;
+        TrechoSentido = trechoSentido;
+        EstacaoCptm = estacaoCptm;
         Endereco = endereco;
-        CoordenadaGeografica = coordenadaGeografica;
-        TipoEfluente = tipoEfluente;
-        StatusDesvioAmbiental = statusDesvioAmbiental;
+        CoordenadaGeografica =
+            coordenadaGeografica;
+
+        TipoAtividade = tipoAtividade;
+        TipoDra = tipoDra;
+        TipoAtividadeCptm =
+            tipoAtividadeCptm;
+        NomeLocalAtividade =
+            nomeLocalAtividade;
+        OrigemEfluente = origemEfluente;
+        FonteGeradora = fonteGeradora;
+        TipoDestinacao = tipoDestinacao;
+        TipoVeiculo = tipoVeiculo;
+
+        StatusDesvioAmbiental =
+            statusDesvioAmbiental;
+
+        StatusRegistroBd =
+            statusRegistroBd;
+
         Observacao = observacao;
 
-        DataCadastro = DateTime.UtcNow;
-
         SyncId = Guid.NewGuid();
-        SyncStatus = "PENDING";
+
+        SyncStatus = SyncStatus.Pending;
+
         CreatedAt = DateTime.UtcNow;
+
         UpdatedAt = DateTime.UtcNow;
+
         IsDeleted = false;
     }
 
     public void Update(
-        string linhaCptm,
-        string viaCptm,
-        string municipio,
-        string endereco,
-        string coordenadaGeografica,
-        string tipoEfluente,
-        string statusDesvioAmbiental,
-        string observacao)
+        string? nomeContratada,
+        string? numeroContrato,
+        string? siglaDepartamentoMeioAmbiente,
+        string? areaGestoraCptm,
+        string? diretoriaCptm,
+        string? programaAmbiental,
+        string? naturezaPga,
+        string? municipio,
+        string? linhaCptm,
+        string? viaCptm,
+        string? trechoSentido,
+        string? estacaoCptm,
+        string? endereco,
+        string? coordenadaGeografica,
+        string? tipoAtividade,
+        string? tipoDra,
+        string? tipoAtividadeCptm,
+        string? nomeLocalAtividade,
+        string? origemEfluente,
+        string? fonteGeradora,
+        string? tipoDestinacao,
+        string? tipoVeiculo,
+        string? statusDesvioAmbiental,
+        string? statusRegistroBd,
+        string? observacao)
     {
-        ValidateBasic(
-            linhaCptm,
-            viaCptm,
-            municipio
-        );
+        NomeContratada = nomeContratada;
+
+        NumeroContrato = numeroContrato;
+
+        SiglaDepartamentoMeioAmbiente =
+            siglaDepartamentoMeioAmbiente;
+
+        AreaGestoraCptm =
+            areaGestoraCptm;
+
+        DiretoriaCptm =
+            diretoriaCptm;
+
+        ProgramaAmbiental =
+            programaAmbiental;
+
+        NaturezaPga =
+            naturezaPga;
+
+        Municipio = municipio;
 
         LinhaCptm = linhaCptm;
+
         ViaCptm = viaCptm;
-        Municipio = municipio;
+
+        TrechoSentido =
+            trechoSentido;
+
+        EstacaoCptm =
+            estacaoCptm;
+
         Endereco = endereco;
-        CoordenadaGeografica = coordenadaGeografica;
-        TipoEfluente = tipoEfluente;
-        StatusDesvioAmbiental = statusDesvioAmbiental;
-        Observacao = observacao;
+
+        CoordenadaGeografica =
+            coordenadaGeografica;
+
+        TipoAtividade =
+            tipoAtividade;
+
+        TipoDra =
+            tipoDra;
+
+        TipoAtividadeCptm =
+            tipoAtividadeCptm;
+
+        NomeLocalAtividade =
+            nomeLocalAtividade;
+
+        OrigemEfluente =
+            origemEfluente;
+
+        FonteGeradora =
+            fonteGeradora;
+
+        TipoDestinacao =
+            tipoDestinacao;
+
+        TipoVeiculo =
+            tipoVeiculo;
+
+        StatusDesvioAmbiental =
+            statusDesvioAmbiental;
+
+        StatusRegistroBd =
+            statusRegistroBd;
+
+        Observacao =
+            observacao;
+
         UpdatedAt = DateTime.UtcNow;
-        SyncStatus = "PENDING";
-    }
 
-    private void Validate(
-        string nomeContratada,
-        string numeroContrato,
-        string linhaCptm,
-        string viaCptm,
-        string municipio)
-    {
-        if (string.IsNullOrWhiteSpace(nomeContratada))
-            throw new Exception("Nome da contratada obrigatório");
-
-        if (string.IsNullOrWhiteSpace(numeroContrato))
-            throw new Exception("Número do contrato obrigatório");
-
-        ValidateBasic(
-            linhaCptm,
-            viaCptm,
-            municipio
-        );
-    }
-
-    private void ValidateBasic(
-        string linhaCptm,
-        string viaCptm,
-        string municipio)
-    {
-        if (string.IsNullOrWhiteSpace(linhaCptm))
-            throw new Exception("Linha CPTM obrigatória");
-
-        if (string.IsNullOrWhiteSpace(viaCptm))
-            throw new Exception("Via CPTM obrigatória");
-
-        if (string.IsNullOrWhiteSpace(municipio))
-            throw new Exception("Município obrigatório");
+        SyncStatus = SyncStatus.Pending;
     }
 
     public void Delete()
@@ -158,6 +270,6 @@
 
         UpdatedAt = DateTime.UtcNow;
 
-        SyncStatus = "PENDING";
+        SyncStatus = SyncStatus.Pending;
     }
 }
