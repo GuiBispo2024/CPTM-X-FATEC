@@ -1,15 +1,73 @@
-import { createRouter, createWebHistory } from "vue-router";
-import UsersList from "../views/UsersList.vue";
-import CreateUser from "../views/CreateUser.vue";
-import EditUser from "../views/EditUser.vue";
+import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '../stores/authStore'
 
 const routes = [
-  { path: "/", component: UsersList },
-  { path: "/create", component: CreateUser },
-  { path: "/edit/:id", component: EditUser },
-];
+  {
+    path: '/',
+    redirect: '/home'
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: () => import('../views/LoginView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('../views/ForgotPasswordView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/home',
+    name: 'Home',
+    component: () => import('../views/HomeView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/formulario/novo',
+    name: 'NovoFormulario',
+    component: () => import('../views/FormularioView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/formulario/:id',
+    name: 'EditarFormulario',
+    component: () => import('../views/FormularioView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/perfil',
+    name: 'Perfil',
+    component: () => import('../views/PerfilView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'NotFound',
+    component: () => import('../views/NotFoundView.vue')
+  }
+]
 
-export default createRouter({
+const router = createRouter({
   history: createWebHistory(),
-  routes,
-});
+  routes
+})
+
+// router.beforeEach(async (to, from, next) => {
+//   const authStore = useAuthStore()
+
+//   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+//     next('/login')
+//   } else if (to.path === '/login'  && authStore.isAuthenticated) {
+//     next('/home')
+//   } else {
+//     next()
+//   }
+// })
+
+router.beforeEach((to, from, next) => {
+  next()
+})
+
+export default router
