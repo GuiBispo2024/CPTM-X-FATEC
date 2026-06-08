@@ -1,6 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<ItemGroup>
+	  <Compile Remove="Migrations\20260525224230_InitialEfluenteStructure.cs" />
+	  <Compile Remove="Migrations\20260525224230_InitialEfluenteStructure.Designer.cs" />
+	  <Compile Remove="Migrations\20260531172245_CreateMunicipio.cs" />
+	  <Compile Remove="Migrations\20260531172245_CreateMunicipio.Designer.cs" />
+	  <Compile Remove="Migrations\20260531184000_CreateLinhaCptm.cs" />
+	  <Compile Remove="Migrations\20260531184000_CreateLinhaCptm.Designer.cs" />
+	  <Compile Remove="Migrations\20260531185238_CreateEstacaoCptm.cs" />
+	  <Compile Remove="Migrations\20260531185238_CreateEstacaoCptm.Designer.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="MailKit" Version="4.16.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.7" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.7">

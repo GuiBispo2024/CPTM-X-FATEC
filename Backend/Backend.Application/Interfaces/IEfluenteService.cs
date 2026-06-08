@@ -1,14 +1,17 @@
 ﻿public interface IEfluenteService
 {
-    Task<EfluenteResponse> Create(CreateEfluenteRequest request);
+    Task<EfluenteResponse> GetByIdAsync(
+        string codigoMeioAmbienteCptm);
 
-    Task Update(int id,UpdateEfluenteRequest request);
+    Task<IEnumerable<EfluenteResponse>> GetAllAsync();
 
-    Task Delete(int id);
+    Task<EfluenteResponse> CreateAsync(
+        CreateEfluenteRequest request);
 
-    Task<EfluenteResponse> GetById(int id);
+    Task UpdateAsync(
+        string codigoMeioAmbienteCptm,
+        UpdateEfluenteRequest request);
 
-    Task<List<EfluenteResponse>> GetAll();
-
-    Task<List<EfluenteResponse>> GetPendingSync();
+    Task DeleteAsync(
+        string codigoMeioAmbienteCptm);
 }

@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/efluentes")]
-public class EfluenteController
-    : ControllerBase
+[Route("api/efluente")]
+public class EfluenteController : ControllerBase
 {
     private readonly IEfluenteService _service;
 
@@ -16,59 +15,60 @@ public class EfluenteController
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        return Ok(
-            await _service.GetAll()
-        );
+        var result =
+            await _service.GetAllAsync();
+
+        return Ok(result);
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{codigoMeioAmbienteCptm}")]
     public async Task<IActionResult> GetById(
-        int id)
+        string codigoMeioAmbienteCptm)
     {
-        return Ok(
-            await _service.GetById(id)
-        );
+        var result =
+            await _service.GetByIdAsync(
+                codigoMeioAmbienteCptm);
+
+        return Ok(result);
     }
 
     [HttpPost]
     public async Task<IActionResult> Create(
-        CreateEfluenteRequest request)
+        [FromBody] CreateEfluenteRequest request)
     {
-        var response =
-            await _service.Create(request);
+        var result =
+            await _service.CreateAsync(
+                request);
 
-        return Ok(response);
+        return CreatedAtAction(
+            nameof(GetById),
+            new
+            {
+                codigoMeioAmbienteCptm =
+                    result.CodigoMeioAmbienteCptm
+            },
+            result);
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{codigoMeioAmbienteCptm}")]
     public async Task<IActionResult> Update(
-        int id,
-        UpdateEfluenteRequest request)
+        string codigoMeioAmbienteCptm,
+        [FromBody] UpdateEfluenteRequest request)
     {
-        await _service.Update(id, request);
-
-        return Ok(new
-        {
-            message =
-                "Efluente atualizado com sucesso"
-        });
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(
-        int id)
-    {
-        await _service.Delete(id);
+        await _service.UpdateAsync(
+            codigoMeioAmbienteCptm,
+            request);
 
         return NoContent();
     }
 
-    [HttpGet("pending-sync")]
-    public async Task<IActionResult> GetPendingSync()
+    [HttpDelete("{codigoMeioAmbienteCptm}")]
+    public async Task<IActionResult> Delete(
+        string codigoMeioAmbienteCptm)
     {
-        var result =
-            await _service.GetPendingSync();
+        await _service.DeleteAsync(
+            codigoMeioAmbienteCptm);
 
-        return Ok(result);
+        return NoContent();
     }
 }

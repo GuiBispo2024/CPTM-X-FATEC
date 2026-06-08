@@ -1,14 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Controllers
-builder.Services.AddControllers();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -50,12 +48,15 @@ builder.Services.AddSwaggerGen(options =>
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
+{
     options.UseOracle(
-        builder.Configuration.GetConnectionString("OracleDb"),
-        b => b.MigrationsAssembly("Backend.Infrastructure")
-));
+        builder.Configuration.GetConnectionString("OracleDb"));
 
-// DI
+    options.EnableSensitiveDataLogging();
+    options.LogTo(Console.WriteLine);
+});
+
+// Dependency Injection
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasherService>();
@@ -65,6 +66,8 @@ builder.Services.AddScoped<IPasswordResetTokenRepository,PasswordResetTokenRepos
 builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddScoped<IEfluenteRepository,EfluenteRepository>();
 builder.Services.AddScoped<IEfluenteService,EfluenteService>();
+builder.Services.AddScoped<IDominioRepository, DominioRepository>();
+builder.Services.AddScoped<IDominioService, DominioService>();
 
 // Status converter
 builder.Services
@@ -110,6 +113,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddAutoMapper(
+    AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 

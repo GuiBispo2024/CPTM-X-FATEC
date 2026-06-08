@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-public class EfluenteRepository
-    : IEfluenteRepository
+public class EfluenteRepository : IEfluenteRepository
 {
     private readonly AppDbContext _context;
 
@@ -11,56 +10,64 @@ public class EfluenteRepository
         _context = context;
     }
 
-    public async Task Add(
+    public async Task<Efluente?> GetByIdAsync(
+        string codigoMeioAmbienteCptm)
+    {
+        return await _context.Efluentes
+            .FirstOrDefaultAsync(x =>
+                x.CodigoMeioAmbienteCptm ==
+                codigoMeioAmbienteCptm &&
+                !x.IsDeleted);
+    }
+
+    public async Task<IEnumerable<Efluente>> GetAllAsync()
+    {
+        return await _context.Efluentes
+            .Where(x => !x.IsDeleted)
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<bool> ExistsAsync(
+        string codigoMeioAmbienteCptm)
+    {
+        var count = await _context.Efluentes
+            .CountAsync(x =>
+                x.CodigoMeioAmbienteCptm ==
+                codigoMeioAmbienteCptm &&
+                !x.IsDeleted);
+
+        return count > 0;
+    }
+
+    public async Task AddAsync(
         Efluente efluente)
     {
         await _context.Efluentes
             .AddAsync(efluente);
-
-        await _context.SaveChangesAsync();
     }
 
-    public async Task Update(
+    public Task UpdateAsync(
         Efluente efluente)
     {
-        _context.Efluentes.Update(efluente);
+        _context.Efluentes
+            .Update(efluente);
 
-        await _context.SaveChangesAsync();
+        return Task.CompletedTask;
     }
 
-    public async Task Delete(
-    Efluente efluente)
+    public Task DeleteAsync(
+        Efluente efluente)
     {
-        _context.Efluentes.Update(efluente);
+        _context.Efluentes
+            .Update(efluente);
 
-        await _context.SaveChangesAsync();
+        return Task.CompletedTask;
     }
 
-    public async Task<Efluente?> GetById(
-        int id)
+    public async Task<int> SaveChangesAsync()
     {
-        return await _context.Efluentes
-            .FirstOrDefaultAsync(
-                e => e.Id == id &&
-                     !e.IsDeleted
-            );
-    }
-
-    public async Task<List<Efluente>> GetAll()
-    {
-        return await _context.Efluentes
-            .Where(e => !e.IsDeleted)
-            .ToListAsync();
-    }
-
-    public async Task<List<Efluente>>
-        GetPendingSync()
-    {
-        return await _context.Efluentes
-            .Where(
-                e => e.SyncStatus ==
-                     SyncStatus.Pending
-            )
-            .ToListAsync();
+        return await _context
+            .SaveChangesAsync();
     }
 }

@@ -1,204 +1,434 @@
-﻿public class EfluenteService : IEfluenteService
+﻿using AutoMapper;
+
+public class EfluenteService : IEfluenteService
 {
-    private readonly IEfluenteRepository _repo;
+    private readonly IEfluenteRepository _repository;
+    private readonly IDominioRepository _dominioRepository;
+    private readonly IMapper _mapper;
 
     public EfluenteService(
-        IEfluenteRepository repo)
+        IEfluenteRepository repository,
+        IDominioRepository dominioRepository,
+        IMapper mapper)
     {
-        _repo = repo;
+        _repository = repository;
+        _dominioRepository = dominioRepository;
+        _mapper = mapper;
     }
 
-    public async Task<EfluenteResponse> Create(
-        CreateEfluenteRequest request)
+    public async Task<EfluenteResponse>
+     GetByIdAsync(
+         string codigoMeioAmbienteCptm)
     {
-        var efluente = new Efluente(
-            request.NomeContratada,
-            request.NumeroContrato,
-            request.SiglaDepartamentoMeioAmbiente,
-            request.AreaGestoraCptm,
-            request.DiretoriaCptm,
-            request.ProgramaAmbiental,
-            request.NaturezaPga,
-            request.Municipio,
-            request.LinhaCptm,
-            request.ViaCptm,
-            request.TrechoSentido,
-            request.EstacaoCptm,
-            request.Endereco,
-            request.CoordenadaGeografica,
-            request.TipoAtividade,
-            request.TipoDra,
-            request.TipoAtividadeCptm,
-            request.NomeLocalAtividade,
-            request.OrigemEfluente,
-            request.FonteGeradora,
-            request.TipoDestinacao,
-            request.TipoVeiculo,
-            request.StatusDesvioAmbiental,
-            request.StatusRegistroBd,
-            request.Observacao
-        );
+        var efluente =
+            await GetEntityAsync(
+                codigoMeioAmbienteCptm);
 
-        await _repo.Add(efluente);
+        var response =
+            _mapper.Map<EfluenteResponse>(
+                efluente);
 
-        return MapToResponse(efluente);
+        response.Municipio =
+            await ObterDescricaoDominio(
+                efluente.Municipio,
+                "Municipio");
+
+        return response;
     }
 
-    public async Task Update(
-        int id,
+    public async Task<IEnumerable<EfluenteResponse>>
+        GetAllAsync()
+    {
+        var efluentes =
+            await _repository.GetAllAsync();
+
+        var responses =
+            new List<EfluenteResponse>();
+
+        foreach (var efluente in efluentes)
+        {
+            var response =
+                _mapper.Map<EfluenteResponse>(
+                    efluente);
+
+            response.SiglaDepartamentoMeioAmbiente =
+                await ObterDescricaoDominio(
+                    efluente.SiglaDepartamentoMeioAmbiente,
+                    "Sigla Departamento Meio Ambiente");
+
+            response.StatusDesvioAmbiental =
+                await ObterDescricaoDominio(
+                    efluente.StatusDesvioAmbiental,
+                    "Status Desvio Ambiental");
+
+            response.StatusRegistroBd =
+                await ObterDescricaoDominio(
+                    efluente.StatusRegistroBd,
+                    "Status Registro BD");
+
+            response.Municipio =
+                await ObterDescricaoDominio(
+                    efluente.Municipio,
+                    "Municipio");
+
+            response.LinhaCptm =
+                await ObterDescricaoDominio(
+                    efluente.LinhaCptm,
+                    "Linha CPTM");
+
+            response.ViaCptm =
+                await ObterDescricaoDominio(
+                    efluente.ViaCptm,
+                    "Via CPTM");
+
+            response.TrechoSentidoCptm =
+                await ObterDescricaoDominio(
+                    efluente.TrechoSentidoCptm,
+                    "Trecho e Sentido CPTM");
+
+            response.EstacaoCptm =
+                await ObterDescricaoDominio(
+                    efluente.EstacaoCptm,
+                    "Estacao CPTM");
+
+            response.NaturezaPga =
+                await ObterDescricaoDominio(
+                    efluente.NaturezaPga,
+                    "Natureza do PGA");
+
+            response.TipoAtividadeListada =
+                await ObterDescricaoDominio(
+                    efluente.TipoAtividadeListada,
+                    "Tipo Atividade Listada");
+
+            response.TipoDraListado =
+                await ObterDescricaoDominio(
+                    efluente.TipoDraListado,
+                    "Tipo DRA Listado");
+
+            response.TipoAtividadeCptm =
+                await ObterDescricaoDominio(
+                    efluente.TipoAtividadeCptm,
+                    "Tipo Atividade CPTM");
+
+            response.NomeLocalAtividade =
+                await ObterDescricaoDominio(
+                    efluente.NomeLocalAtividade,
+                    "Nome Local Atividade");
+
+            response.OrigemEfluente =
+                await ObterDescricaoDominio(
+                    efluente.OrigemEfluente,
+                    "Origem Efluente");
+
+            response.FonteGeradora =
+                await ObterDescricaoDominio(
+                    efluente.FonteGeradora,
+                    "Fonte Geradora");
+
+            response.TipoDestinacao =
+                await ObterDescricaoDominio(
+                    efluente.TipoDestinacao,
+                    "Tipo Destinacao");
+
+            response.TipoVeiculo =
+                await ObterDescricaoDominio(
+                    efluente.TipoVeiculo,
+                    "Tipo Veiculo");
+
+            response.Proprietario =
+                await ObterDescricaoDominio(
+                    efluente.Proprietario,
+                    "Proprietario");
+
+            response.NomeAreaGestoraCptm =
+                await ObterDescricaoDominio(
+                    efluente.NomeAreaGestoraCptm,
+                    "Nome Área Gestora CPTM");
+
+            responses.Add(response);
+        }
+
+        return responses;
+    }
+
+    public async Task<EfluenteResponse>
+        CreateAsync(
+            CreateEfluenteRequest request)
+    {
+
+        await ValidarDominiosAsync(request);
+
+        var data =
+            _mapper.Map<EfluenteData>(
+                request);
+
+        var efluente =
+            new Efluente(data);
+
+        await _repository.AddAsync(
+            efluente);
+
+        await _repository.SaveChangesAsync();
+
+        return _mapper.Map<EfluenteResponse>(
+            efluente);
+    }
+
+    public async Task UpdateAsync(
+        string codigoMeioAmbienteCptm,
         UpdateEfluenteRequest request)
     {
         var efluente =
-            await _repo.GetById(id);
+            await GetEntityAsync(
+                codigoMeioAmbienteCptm);
 
-        if (efluente == null)
-            throw new Exception(
-                "Efluente não encontrado"
-            );
+        var data =
+            _mapper.Map<EfluenteData>(
+                request);
 
-        efluente.Update(
-            request.NomeContratada,
-            request.NumeroContrato,
-            request.SiglaDepartamentoMeioAmbiente,
-            request.AreaGestoraCptm,
-            request.DiretoriaCptm,
-            request.ProgramaAmbiental,
-            request.NaturezaPga,
-            request.Municipio,
-            request.LinhaCptm,
-            request.ViaCptm,
-            request.TrechoSentido,
-            request.EstacaoCptm,
-            request.Endereco,
-            request.CoordenadaGeografica,
-            request.TipoAtividade,
-            request.TipoDra,
-            request.TipoAtividadeCptm,
-            request.NomeLocalAtividade,
-            request.OrigemEfluente,
-            request.FonteGeradora,
-            request.TipoDestinacao,
-            request.TipoVeiculo,
-            request.StatusDesvioAmbiental,
-            request.StatusRegistroBd,
-            request.Observacao
-        );
+        await ValidarDominiosAsync(request);
 
-        await _repo.Update(efluente);
+        efluente.Update(data);
+
+        await _repository.SaveChangesAsync();
     }
 
-    public async Task Delete(int id)
+    public async Task DeleteAsync(
+        string codigoMeioAmbienteCptm)
     {
         var efluente =
-            await _repo.GetById(id);
-
-        if (efluente == null)
-            throw new Exception(
-                "Efluente não encontrado"
-            );
+            await GetEntityAsync(
+                codigoMeioAmbienteCptm);
 
         efluente.Delete();
 
-        await _repo.Update(efluente);
+        await _repository.SaveChangesAsync();
     }
 
-    public async Task<EfluenteResponse> GetById(
-        int id)
+    private async Task<Efluente>
+        GetEntityAsync(
+            string codigoMeioAmbienteCptm)
     {
         var efluente =
-            await _repo.GetById(id);
+            await _repository.GetByIdAsync(
+                codigoMeioAmbienteCptm);
 
-        if (efluente == null)
-            throw new Exception(
-                "Efluente não encontrado"
-            );
-
-        return MapToResponse(efluente);
-    }
-
-    public async Task<List<EfluenteResponse>>
-        GetAll()
-    {
-        var efluentes =
-            await _repo.GetAll();
-
-        return efluentes
-            .Select(MapToResponse)
-            .ToList();
-    }
-
-    public async Task<List<EfluenteResponse>>
-        GetPendingSync()
-    {
-        var efluentes =
-            await _repo.GetPendingSync();
-
-        return efluentes
-            .Select(MapToResponse)
-            .ToList();
-    }
-
-    private EfluenteResponse MapToResponse(
-        Efluente e)
-    {
-        return new EfluenteResponse
+        if (efluente is null)
         {
-            Id = e.Id,
-            SyncId = e.SyncId,
-            SyncStatus = e.SyncStatus,
+            throw new NotFoundException(
+                $"Efluente '{codigoMeioAmbienteCptm}' não encontrado.");
+        }
 
-            NomeContratada = e.NomeContratada,
-            NumeroContrato = e.NumeroContrato,
-            SiglaDepartamentoMeioAmbiente =
-                e.SiglaDepartamentoMeioAmbiente,
-            AreaGestoraCptm =
-                e.AreaGestoraCptm,
-            DiretoriaCptm =
-                e.DiretoriaCptm,
-            ProgramaAmbiental =
-                e.ProgramaAmbiental,
-            NaturezaPga =
-                e.NaturezaPga,
+        return efluente;
+    }
 
-            Municipio = e.Municipio,
-            LinhaCptm = e.LinhaCptm,
-            ViaCptm = e.ViaCptm,
-            TrechoSentido =
-                e.TrechoSentido,
-            EstacaoCptm =
-                e.EstacaoCptm,
-            Endereco = e.Endereco,
-            CoordenadaGeografica =
-                e.CoordenadaGeografica,
+    private async Task ValidarDominioAsync(
+        int? codigo,
+        string dominio)
+    {
+        if (!codigo.HasValue)
+            return;
 
-            TipoAtividade =
-                e.TipoAtividade,
-            TipoDra =
-                e.TipoDra,
-            TipoAtividadeCptm =
-                e.TipoAtividadeCptm,
-            NomeLocalAtividade =
-                e.NomeLocalAtividade,
-            OrigemEfluente =
-                e.OrigemEfluente,
-            FonteGeradora =
-                e.FonteGeradora,
-            TipoDestinacao =
-                e.TipoDestinacao,
-            TipoVeiculo =
-                e.TipoVeiculo,
+        var tableName =
+            DominioTableResolver
+                .GetTableName(dominio);
 
-            StatusDesvioAmbiental =
-                e.StatusDesvioAmbiental,
+        var existe =
+            await _dominioRepository
+                .ExistsAsync(
+                    tableName,
+                    codigo.Value);
 
-            StatusRegistroBd =
-                e.StatusRegistroBd,
+        if (!existe)
+        {
+            throw new Exception(
+                $"{dominio} inválido.");
+        }
+    }
 
-            Observacao = e.Observacao,
+    private async Task ValidarDominiosAsync(
+        CreateEfluenteRequest request)
+    {
+        await ValidarDominioAsync(
+            request.SiglaDepartamentoMeioAmbiente,
+            "Sigla Departamento Meio Ambiente");
 
-            CreatedAt = e.CreatedAt,
-            UpdatedAt = e.UpdatedAt,
-            IsDeleted = e.IsDeleted
-        };
+        await ValidarDominioAsync(
+            request.StatusDesvioAmbiental,
+            "Status Desvio Ambiental");
+
+        await ValidarDominioAsync(
+            request.StatusRegistroBd,
+            "Status Registro BD");
+
+        await ValidarDominioAsync(
+            request.Municipio,
+            "Municipio");
+
+        await ValidarDominioAsync(
+            request.LinhaCptm,
+            "Linha CPTM");
+
+        await ValidarDominioAsync(
+            request.ViaCptm,
+            "Via CPTM");
+
+        await ValidarDominioAsync(
+            request.TrechoSentidoCptm,
+            "Trecho e Sentido CPTM");
+
+        await ValidarDominioAsync(
+            request.EstacaoCptm,
+            "Estacao CPTM");
+
+        await ValidarDominioAsync(
+            request.NaturezaPga,
+            "Natureza do PGA");
+
+        await ValidarDominioAsync(
+            request.TipoAtividadeListada,
+            "Tipo Atividade Listada");
+
+        await ValidarDominioAsync(
+            request.TipoDraListado,
+            "Tipo DRA Listado");
+
+        await ValidarDominioAsync(
+            request.TipoAtividadeCptm,
+            "Tipo Atividade CPTM");
+
+        await ValidarDominioAsync(
+            request.NomeLocalAtividade,
+            "Nome Local Atividade");
+
+        await ValidarDominioAsync(
+            request.OrigemEfluente,
+            "Origem Efluente");
+
+        await ValidarDominioAsync(
+            request.FonteGeradora,
+            "Fonte Geradora");
+
+        await ValidarDominioAsync(
+            request.TipoDestinacao,
+            "Tipo Destinacao");
+
+        await ValidarDominioAsync(
+            request.TipoVeiculo,
+            "Tipo Veiculo");
+
+        await ValidarDominioAsync(
+            request.OfereceRiscoSistemaCptm,
+            "Sim Nao");
+
+        await ValidarDominioAsync(
+           request.Proprietario,
+           "Proprietario");
+
+        await ValidarDominioAsync(
+            request.NomeAreaGestoraCptm,
+            "Nome Área Gestora CPTM");
+    }
+
+    private async Task ValidarDominiosAsync(
+        UpdateEfluenteRequest request)
+    {
+        await ValidarDominioAsync(
+            request.SiglaDepartamentoMeioAmbiente,
+            "Sigla Departamento Meio Ambiente");
+
+        await ValidarDominioAsync(
+            request.StatusDesvioAmbiental,
+            "Status Desvio Ambiental");
+
+        await ValidarDominioAsync(
+            request.StatusRegistroBd,
+            "Status Registro BD");
+
+        await ValidarDominioAsync(
+            request.Municipio,
+            "Municipio");
+
+        await ValidarDominioAsync(
+            request.LinhaCptm,
+            "Linha CPTM");
+
+        await ValidarDominioAsync(
+            request.ViaCptm,
+            "Via CPTM");
+
+        await ValidarDominioAsync(
+            request.TrechoSentidoCptm,
+            "Trecho e Sentido CPTM");
+
+        await ValidarDominioAsync(
+            request.EstacaoCptm,
+            "Estacao CPTM");
+
+        await ValidarDominioAsync(
+            request.NaturezaPga,
+            "Natureza do PGA");
+
+        await ValidarDominioAsync(
+            request.TipoAtividadeListada,
+            "Tipo Atividade Listada");
+
+        await ValidarDominioAsync(
+            request.TipoDraListado,
+            "Tipo DRA Listado");
+
+        await ValidarDominioAsync(
+            request.TipoAtividadeCptm,
+            "Tipo Atividade CPTM");
+
+        await ValidarDominioAsync(
+            request.NomeLocalAtividade,
+            "Nome Local Atividade");
+
+        await ValidarDominioAsync(
+            request.OrigemEfluente,
+            "Origem Efluente");
+
+        await ValidarDominioAsync(
+            request.FonteGeradora,
+            "Fonte Geradora");
+
+        await ValidarDominioAsync(
+            request.TipoDestinacao,
+            "Tipo Destinacao");
+
+        await ValidarDominioAsync(
+            request.TipoVeiculo,
+            "Tipo Veiculo");
+
+        await ValidarDominioAsync(
+            request.OfereceRiscoSistemaCptm,
+            "Sim Nao");
+
+        await ValidarDominioAsync(
+            request.Proprietario,
+            "Proprietario");
+
+        await ValidarDominioAsync(
+            request.NomeAreaGestoraCptm,
+            "Nome Área Gestora CPTM");
+    }
+
+    private async Task<string?> ObterDescricaoDominio(
+        int? codigo,
+        string dominio)
+    {
+        if (!codigo.HasValue)
+            return null;
+
+        var tableName =
+            DominioTableResolver
+                .GetTableName(dominio);
+
+        return await _dominioRepository
+            .GetDescricaoAsync(
+                tableName,
+                codigo.Value);
     }
 }

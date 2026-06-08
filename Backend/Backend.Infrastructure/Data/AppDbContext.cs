@@ -8,6 +8,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Efluente> Efluentes { get; set; }
 
+    public DbSet<Dominio> Dominios { get; set; }
+
     public AppDbContext(
         DbContextOptions<AppDbContext> options
     ) : base(options)
@@ -19,10 +21,11 @@ public class AppDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.ApplyConfigurationsFromAssembly(
-            typeof(AppDbContext).Assembly
-        );
-
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         modelBuilder.HasSequence<int>("SEQ_USERS");
+        modelBuilder.Entity<Efluente>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Dominio>()
+            .HasNoKey();
     }
 }

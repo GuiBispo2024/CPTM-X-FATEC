@@ -1,14 +1,17 @@
 ﻿public interface IEfluenteRepository
 {
-    Task Add(Efluente efluente);
+    Task<Efluente?> GetByIdAsync(string codigoMeioAmbienteCptm);
 
-    Task Update(Efluente efluente);
+    Task<IEnumerable<Efluente>> GetAllAsync();
 
-    Task Delete(Efluente efluente);
+    Task<bool> ExistsAsync(string codigoMeioAmbienteCptm);
 
-    Task<Efluente?> GetById(int id);
+    Task AddAsync(Efluente efluente);
 
-    Task<List<Efluente>> GetAll();
+    Task UpdateAsync(Efluente efluente);
 
-    Task<List<Efluente>> GetPendingSync();
+    Task DeleteAsync(Efluente efluente);
+
+    Task<int> SaveChangesAsync();
+
 }
