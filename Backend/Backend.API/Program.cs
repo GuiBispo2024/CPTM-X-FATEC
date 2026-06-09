@@ -68,6 +68,7 @@ builder.Services.AddScoped<IEfluenteRepository,EfluenteRepository>();
 builder.Services.AddScoped<IEfluenteService,EfluenteService>();
 builder.Services.AddScoped<IDominioRepository, DominioRepository>();
 builder.Services.AddScoped<IDominioService, DominioService>();
+builder.Services.AddSingleton<IDominioCacheService,DominioCacheService>();
 
 // Status converter
 builder.Services
@@ -118,6 +119,18 @@ builder.Services.AddAutoMapper(
     AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
+
+// Load cache
+using (var scope =
+    app.Services.CreateScope())
+{
+    var cache =
+        scope.ServiceProvider
+            .GetRequiredService<
+                IDominioCacheService>();
+
+    await cache.LoadAsync();
+}
 
 // Swagger
 if (app.Environment.IsDevelopment())

@@ -84,4 +84,11 @@
         throw new KeyNotFoundException(
             $"Domínio '{dominio}' não encontrado.");
     }
+
+    public static IReadOnlyDictionary<
+        string,
+        string> GetAll()
+        {
+            return Tables;
+        }
 }

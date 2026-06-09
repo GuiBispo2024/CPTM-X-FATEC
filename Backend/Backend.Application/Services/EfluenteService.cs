@@ -5,15 +5,18 @@ public class EfluenteService : IEfluenteService
     private readonly IEfluenteRepository _repository;
     private readonly IDominioRepository _dominioRepository;
     private readonly IMapper _mapper;
+    private readonly IDominioCacheService _dominioCacheService;
 
     public EfluenteService(
         IEfluenteRepository repository,
         IDominioRepository dominioRepository,
-        IMapper mapper)
+        IMapper mapper,
+        IDominioCacheService dominioCacheService)
     {
         _repository = repository;
         _dominioRepository = dominioRepository;
         _mapper = mapper;
+        _dominioCacheService = dominioCacheService;
     }
 
     public async Task<EfluenteResponse>
@@ -28,10 +31,100 @@ public class EfluenteService : IEfluenteService
             _mapper.Map<EfluenteResponse>(
                 efluente);
 
+        response.SiglaDepartamentoMeioAmbiente =
+            ObterDescricaoDominio(
+                 efluente.SiglaDepartamentoMeioAmbiente,
+                 "Sigla Departamento Meio Ambiente");
+
+        response.StatusDesvioAmbiental =
+            ObterDescricaoDominio(
+                efluente.StatusDesvioAmbiental,
+                "Status Desvio Ambiental");
+
+        response.StatusRegistroBd =
+            ObterDescricaoDominio(
+                efluente.StatusRegistroBd,
+                "Status Registro BD");
+
         response.Municipio =
-            await ObterDescricaoDominio(
+            ObterDescricaoDominio(
                 efluente.Municipio,
                 "Municipio");
+
+        response.LinhaCptm =
+            ObterDescricaoDominio(
+                efluente.LinhaCptm,
+                "Linha CPTM");
+
+        response.ViaCptm =
+            ObterDescricaoDominio(
+                efluente.ViaCptm,
+                "Via CPTM");
+
+        response.TrechoSentidoCptm =
+            ObterDescricaoDominio(
+                efluente.TrechoSentidoCptm,
+                "Trecho e Sentido CPTM");
+
+        response.EstacaoCptm =
+            ObterDescricaoDominio(
+                efluente.EstacaoCptm,
+                "Estacao CPTM");
+
+        response.NaturezaPga =
+            ObterDescricaoDominio(
+                efluente.NaturezaPga,
+                "Natureza do PGA");
+
+        response.TipoAtividadeListada =
+            ObterDescricaoDominio(
+                efluente.TipoAtividadeListada,
+                "Tipo Atividade Listada");
+
+        response.TipoDraListado =
+            ObterDescricaoDominio(
+                efluente.TipoDraListado,
+                "Tipo DRA Listado");
+
+        response.TipoAtividadeCptm =
+            ObterDescricaoDominio(
+                efluente.TipoAtividadeCptm,
+                "Tipo Atividade CPTM");
+
+        response.NomeLocalAtividade =
+            ObterDescricaoDominio(
+                efluente.NomeLocalAtividade,
+                "Nome Local Atividade");
+
+        response.OrigemEfluente =
+            ObterDescricaoDominio(
+                efluente.OrigemEfluente,
+                "Origem Efluente");
+
+        response.FonteGeradora =
+            ObterDescricaoDominio(
+                efluente.FonteGeradora,
+                "Fonte Geradora");
+
+        response.TipoDestinacao =
+            ObterDescricaoDominio(
+                efluente.TipoDestinacao,
+                "Tipo Destinacao");
+
+        response.TipoVeiculo =
+            ObterDescricaoDominio(
+                efluente.TipoVeiculo,
+                "Tipo Veiculo");
+
+        response.Proprietario =
+            ObterDescricaoDominio(
+                efluente.Proprietario,
+                "Proprietario");
+
+        response.NomeAreaGestoraCptm =
+            ObterDescricaoDominio(
+                efluente.NomeAreaGestoraCptm,
+                "Nome Área Gestora CPTM");
 
         return response;
     }
@@ -52,97 +145,97 @@ public class EfluenteService : IEfluenteService
                     efluente);
 
             response.SiglaDepartamentoMeioAmbiente =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.SiglaDepartamentoMeioAmbiente,
                     "Sigla Departamento Meio Ambiente");
 
             response.StatusDesvioAmbiental =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.StatusDesvioAmbiental,
                     "Status Desvio Ambiental");
 
             response.StatusRegistroBd =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.StatusRegistroBd,
                     "Status Registro BD");
 
             response.Municipio =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.Municipio,
                     "Municipio");
 
             response.LinhaCptm =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.LinhaCptm,
                     "Linha CPTM");
 
             response.ViaCptm =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.ViaCptm,
                     "Via CPTM");
 
             response.TrechoSentidoCptm =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.TrechoSentidoCptm,
                     "Trecho e Sentido CPTM");
 
             response.EstacaoCptm =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.EstacaoCptm,
                     "Estacao CPTM");
 
             response.NaturezaPga =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.NaturezaPga,
                     "Natureza do PGA");
 
             response.TipoAtividadeListada =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.TipoAtividadeListada,
                     "Tipo Atividade Listada");
 
             response.TipoDraListado =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.TipoDraListado,
                     "Tipo DRA Listado");
 
             response.TipoAtividadeCptm =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.TipoAtividadeCptm,
                     "Tipo Atividade CPTM");
 
             response.NomeLocalAtividade =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.NomeLocalAtividade,
                     "Nome Local Atividade");
 
             response.OrigemEfluente =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.OrigemEfluente,
                     "Origem Efluente");
 
             response.FonteGeradora =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.FonteGeradora,
                     "Fonte Geradora");
 
             response.TipoDestinacao =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.TipoDestinacao,
                     "Tipo Destinacao");
 
             response.TipoVeiculo =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.TipoVeiculo,
                     "Tipo Veiculo");
 
             response.Proprietario =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.Proprietario,
                     "Proprietario");
 
             response.NomeAreaGestoraCptm =
-                await ObterDescricaoDominio(
+                ObterDescricaoDominio(
                     efluente.NomeAreaGestoraCptm,
                     "Nome Área Gestora CPTM");
 
@@ -223,21 +316,17 @@ public class EfluenteService : IEfluenteService
         return efluente;
     }
 
-    private async Task ValidarDominioAsync(
-        int? codigo,
-        string dominio)
+    private Task ValidarDominioAsync(
+         int? codigo,
+         string dominio)
     {
         if (!codigo.HasValue)
-            return;
-
-        var tableName =
-            DominioTableResolver
-                .GetTableName(dominio);
+            return Task.CompletedTask;
 
         var existe =
-            await _dominioRepository
-                .ExistsAsync(
-                    tableName,
+            _dominioCacheService
+                .Exists(
+                    dominio,
                     codigo.Value);
 
         if (!existe)
@@ -245,6 +334,8 @@ public class EfluenteService : IEfluenteService
             throw new Exception(
                 $"{dominio} inválido.");
         }
+
+        return Task.CompletedTask;
     }
 
     private async Task ValidarDominiosAsync(
@@ -415,20 +506,13 @@ public class EfluenteService : IEfluenteService
             "Nome Área Gestora CPTM");
     }
 
-    private async Task<string?> ObterDescricaoDominio(
-        int? codigo,
-        string dominio)
+    private string? ObterDescricaoDominio(
+         int? codigo,
+         string dominio)
     {
-        if (!codigo.HasValue)
-            return null;
-
-        var tableName =
-            DominioTableResolver
-                .GetTableName(dominio);
-
-        return await _dominioRepository
-            .GetDescricaoAsync(
-                tableName,
-                codigo.Value);
+        return _dominioCacheService
+            .GetDescricao(
+                dominio,
+                codigo);
     }
 }
