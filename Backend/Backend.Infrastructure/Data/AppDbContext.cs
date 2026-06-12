@@ -1,8 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Backend.Domain.Entities;
 
 public class AppDbContext : DbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<Efluente> Efluentes { get; set; }
+    public DbSet<Municipio> Municipios { get; set; }
+    public DbSet<FotoEfluente> Fotos { get; set; }
 
     public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
