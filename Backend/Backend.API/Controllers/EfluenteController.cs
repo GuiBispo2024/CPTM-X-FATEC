@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/efluente")]
+[Authorize]
 public class EfluenteController : ControllerBase
 {
     private readonly IEfluenteService _service;
