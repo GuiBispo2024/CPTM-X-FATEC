@@ -1,13 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Backend.Domain;
-using Backend.Infrastructure.Repositories;
-
+using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Controllers
-builder.Services.AddControllers();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
@@ -18,21 +17,68 @@ builder.Services.AddSwaggerGen(options =>
         Title = "API CPTM",
         Version = "v1"
     });
+
+    options.AddSecurityDefinition("Bearer",
+        new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Digite: Bearer {seu token}"
+        });
+
+    options.AddSecurityRequirement(
+        new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    }
+                },
+                Array.Empty<string>()
+            }
+        });
 });
 
 // DbContext
 builder.Services.AddDbContext<AppDbContext>(options =>
+{
     options.UseOracle(
-        builder.Configuration.GetConnectionString("OracleDb"),
-        b => b.MigrationsAssembly("Backend.Infrastructure")
-));
+        builder.Configuration.GetConnectionString("OracleDb"));
 
+    options.EnableSensitiveDataLogging();
+    options.LogTo(Console.WriteLine);
+});
 
-// DI
+// Dependency Injection
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IPasswordHasher, PasswordHasherService>();
-builder.Services.AddScoped<IMunicipioRepository, MunicipioRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPasswordResetTokenRepository,PasswordResetTokenRepository>();
+builder.Services.AddScoped<IEmailService,EmailService>();
+builder.Services.AddScoped<IEfluenteRepository,EfluenteRepository>();
+builder.Services.AddScoped<IEfluenteService,EfluenteService>();
+builder.Services.AddScoped<IDominioRepository, DominioRepository>();
+builder.Services.AddScoped<IDominioService, DominioService>();
+builder.Services.AddSingleton<IDominioCacheService,DominioCacheService>();
+
+// Status converter
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions
+            .Converters
+            .Add(new JsonStringEnumConverter());
+    });
 
 // CORS
 builder.Services.AddCors(options =>
@@ -43,30 +89,47 @@ builder.Services.AddCors(options =>
                         .AllowAnyMethod());
 });
 
+// Authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+
+                ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                ValidAudience = builder.Configuration["Jwt:Audience"],
+
+                IssuerSigningKey =
+                    new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(
+                            builder.Configuration["Jwt:Key"]!
+                        )
+                    )
+            };
+});
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddAutoMapper(
+    AppDomain.CurrentDomain.GetAssemblies());
+
 var app = builder.Build();
 
-// Seed ADM
-using (var scope = app.Services.CreateScope())
+// Load cache
+using (var scope =
+    app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+    var cache =
+        scope.ServiceProvider
+            .GetRequiredService<
+                IDominioCacheService>();
 
-    var adminExists = context.Users
-        .FirstOrDefault(u => u.Email == "admin@cptm.com");
-
-    if (adminExists == null)
-    {
-        var admin = new User(
-            "Admin",
-            "admin@cptm.com",
-            hasher.Hash("admin123")
-        );
-
-        admin.MakeAdmin();
-
-        context.Users.Add(admin);
-        context.SaveChanges();
-    }
+    await cache.LoadAsync();
 }
 
 // Swagger
@@ -79,7 +142,8 @@ if (app.Environment.IsDevelopment())
 // Middlewares
 app.UseCors("AllowAll");
 app.UseHttpsRedirection();
-
+app.UseMiddleware<ExceptionMiddleware>();
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Controllers
